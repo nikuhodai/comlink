@@ -26,11 +26,13 @@ export interface PostMessageWithOrigin {
   ): void;
 }
 
-export interface Endpoint extends EventSource {
+export interface ResolvedEndpoint extends EventSource {
   postMessage(message: any, transfer?: Transferable[]): void;
 
   start?: () => void;
 }
+
+export type Endpoint = ResolvedEndpoint | Promise<ResolvedEndpoint>;
 
 export const enum WireValueType {
   RAW = "RAW",

@@ -10,6 +10,7 @@ import {
   Message,
   MessageType,
   PostMessageWithOrigin,
+  ResolvedEndpoint,
   WireValue,
   WireValueType,
 } from "./protocol";
@@ -292,7 +293,7 @@ function isAllowedOrigin(
 
 export function expose(
   obj: any,
-  ep: Endpoint = globalThis as any,
+  ep: ResolvedEndpoint = globalThis as any,
   allowedOrigins: (string | RegExp)[] = ["*"]
 ) {
   ep.addEventListener("message", function callback(ev: MessageEvent) {
@@ -598,7 +599,7 @@ function requestResponseMessage(
   msg: Message,
   transfers?: Transferable[]
 ): Promise<WireValue> {
-  return new Promise((resolve) => {
+  return Promise.resolve(ep).then((ep) => new Promise((resolve) => {
     const id = generateUUID();
     ep.addEventListener("message", function l(ev: MessageEvent) {
       if (!ev.data || !ev.data.id || ev.data.id !== id) {
@@ -611,7 +612,7 @@ function requestResponseMessage(
       ep.start();
     }
     ep.postMessage({ id, ...msg }, transfers);
-  });
+  }));
 }
 
 function generateUUID(): string {
